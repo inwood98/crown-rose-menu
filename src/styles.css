@@ -1,34 +1,36 @@
 :root {
-  --green-900: #14331f;
-  --green-700: #1f4d2e;
-  --green-600: #2a6a3f;
-  --green-500: #3a8454;
-  --gold-500: #c79a3c;
-  --gold-400: #d9b45a;
-  --gold-100: #f3e7c6;
+  /* Rose & Crown (Barons Pubs) palette: slate blue-grey + dark olive / pale yellow.
+     Variable names kept for stability — here "green-*" = slate, "gold-*" = olive-yellow. */
+  --green-900: #273640; /* darkest slate (header) */
+  --green-700: #36505f; /* primary slate — buttons, headings, prices */
+  --green-600: #4a6675; /* hover / badges */
+  --green-500: #637c8c; /* brand slate */
+  --gold-500: #8f8f33; /* dark olive — for text/icons that need contrast */
+  --gold-400: #d8d88e; /* signature pale yellow — accent lines */
+  --gold-100: #edeed5; /* pale yellow wash */
 
-  --bg: #f7f4ec;
+  --bg: #eef1f4;
   --surface: #ffffff;
-  --surface-2: #f1ede2;
-  --border: #e0d9c7;
-  --text: #20241f;
-  --text-soft: #5d6357;
-  --shadow: 0 1px 3px rgba(20, 51, 31, 0.08), 0 6px 20px rgba(20, 51, 31, 0.06);
+  --surface-2: #e7ecf0;
+  --border: #ccd6dc;
+  --text: #273640;
+  --text-soft: #5f7480;
+  --shadow: 0 1px 3px rgba(39, 54, 64, 0.1), 0 6px 20px rgba(39, 54, 64, 0.08);
 
   --accent: var(--green-700);
   --accent-text: #fff;
 }
 
 :root[data-theme='dark'] {
-  --bg: #14180f;
-  --surface: #1d2218;
-  --surface-2: #262c1f;
-  --border: #333a29;
-  --text: #ecefe4;
-  --text-soft: #a8b09a;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
-  --accent: var(--green-500);
-  --gold-100: #4a4124;
+  --bg: #18222a;
+  --surface: #222e37;
+  --surface-2: #2b3a44;
+  --border: #3a4c57;
+  --text: #e9eef2;
+  --text-soft: #a2b3be;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.4);
+  --accent: #93b0c0; /* lighter slate for contrast on dark */
+  --gold-100: #3c3f22; /* dark olive wash */
 }
 
 * {
@@ -68,7 +70,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 3px solid var(--gold-500);
+  border-bottom: 3px solid var(--gold-400);
 }
 
 .brand {
@@ -91,8 +93,8 @@ body {
 .brand p {
   margin: 0;
   font-size: 0.82rem;
-  /* Header is dark green in both themes, so keep a fixed light gold. */
-  color: #ecd9a3;
+  /* Header is dark slate in both themes, so keep the fixed pale yellow accent. */
+  color: #d8d88e;
 }
 
 .header-actions {
@@ -753,7 +755,7 @@ body {
   align-items: center;
   padding: 0.85rem 1rem;
   background: linear-gradient(135deg, var(--green-900), var(--green-700));
-  border-bottom: 3px solid var(--gold-500);
+  border-bottom: 3px solid var(--gold-400);
 }
 .editor-name {
   flex: 1 1 auto;
@@ -839,7 +841,7 @@ body {
     transition: transform 0.25s ease;
     background: var(--bg);
     padding: 1rem 1rem 5rem;
-    border-top: 3px solid var(--gold-500);
+    border-top: 3px solid var(--gold-400);
     box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.25);
   }
   .summary-col.open {
@@ -860,13 +862,13 @@ body {
     background: var(--green-700);
     color: #fff;
     border: none;
-    border-top: 2px solid var(--gold-500);
+    border-top: 2px solid var(--gold-400);
     padding: 0.9rem 1.25rem;
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
   }
   .mobile-cart-cta {
-    color: #ecd9a3;
+    color: #d8d88e;
   }
 }
