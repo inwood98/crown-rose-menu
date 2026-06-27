@@ -74,7 +74,7 @@ export function AdminView({
   }
 
   function emailPub() {
-    const subject = `Pre-order for ${guests.length} — BA Crown Rose`
+    const subject = `Pre-order for ${guests.length} — Rose & Crown · Nicola & Jennifer's 50th`
     const body = buildRosterText(guests)
     window.location.href = `mailto:${encodeURIComponent(pubEmail.trim())}?subject=${encodeURIComponent(
       subject,

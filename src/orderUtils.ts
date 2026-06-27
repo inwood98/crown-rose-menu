@@ -65,7 +65,7 @@ export interface RosterExport {
 
 export function buildRosterExport(guests: GuestEntry[]): RosterExport {
   return {
-    pub: 'BA Crown Rose',
+    pub: 'Rose & Crown',
     guests: guests.map((g) => ({
       name: g.name,
       items: buildOrderLines(g.order).map((l) => ({
@@ -86,7 +86,7 @@ export function buildRosterExport(guests: GuestEntry[]): RosterExport {
 /** Full roster as plain text for emailing the pub. */
 export function buildRosterText(guests: GuestEntry[]): string {
   const out: string[] = []
-  out.push('BA Crown Rose — Pre-Order')
+  out.push("Rose & Crown — Pre-Order · Nicola & Jennifer's 50th Birthday")
   out.push(`Guests: ${guests.length}`)
   out.push('')
   guests.forEach((g, i) => {

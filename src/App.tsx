@@ -79,7 +79,10 @@ export default function App() {
   const isAdminSide = route.kind === 'admin' || route.kind === 'import'
 
   const headerSub = useMemo(
-    () => (isAdminSide ? 'Organiser · table order' : 'Pre-book your meal · June 2026'),
+    () =>
+      isAdminSide
+        ? "Organiser · Nicola & Jennifer's 50th"
+        : "Pre-book your meal · Nicola & Jennifer's 50th Birthday 🎉",
     [isAdminSide],
   )
 
