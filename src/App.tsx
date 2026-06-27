@@ -86,17 +86,6 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <div className="brand">
-          <img
-            className="brand-logo"
-            src={`${import.meta.env.BASE_URL}logo-rose-crown-icon.svg`}
-            alt="Rose & Crown crest"
-          />
-          <div>
-            <h1>BA Crown Rose</h1>
-            <p>{headerSub}</p>
-          </div>
-        </div>
         <div className="header-actions">
           <a
             className="role-link"
@@ -106,6 +95,16 @@ export default function App() {
             {isAdminSide ? 'Guest entry' : 'Organiser'}
           </a>
           <ThemeToggle theme={theme} onToggle={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))} />
+        </div>
+        <div className="brand-lockup">
+          <h1 className="sr-only">Rose &amp; Crown — pre-book your meal</h1>
+          <img
+            className="brand-logo-full"
+            src={`${import.meta.env.BASE_URL}logo-rose-crown-icon.svg`}
+            alt="Rose &amp; Crown crest"
+          />
+          <p className="brand-tagline">a Barons Pub</p>
+          <p className="brand-sub">{headerSub}</p>
         </div>
       </header>
 
