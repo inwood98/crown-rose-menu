@@ -87,7 +87,11 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <div className="brand">
-          <span className="brand-mark">🌹</span>
+          <img
+            className="brand-logo"
+            src={`${import.meta.env.BASE_URL}logo-rose-crown-icon.svg`}
+            alt="Rose & Crown crest"
+          />
           <div>
             <h1>BA Crown Rose</h1>
             <p>{headerSub}</p>
