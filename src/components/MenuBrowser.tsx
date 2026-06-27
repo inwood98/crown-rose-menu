@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { CATEGORIES, MENU } from '../menu'
-import type { Dietary, MenuItem, Order } from '../types'
+import type { Category, Dietary, MenuItem, Order } from '../types'
 import { FilterBar } from './FilterBar'
 import { MenuItemRow } from './MenuItemRow'
 
@@ -15,6 +15,7 @@ interface Props {
 export function MenuBrowser({ order, onSetQty, showAllergenNote = true }: Props) {
   const [search, setSearch] = useState('')
   const [filters, setFilters] = useState<Set<Dietary>>(new Set())
+  const [collapsed, setCollapsed] = useState<Set<Category>>(new Set())
 
   function toggleFilter(d: Dietary) {
     setFilters((prev) => {
@@ -24,6 +25,18 @@ export function MenuBrowser({ order, onSetQty, showAllergenNote = true }: Props)
       return next
     })
   }
+
+  function toggleCategory(cat: Category) {
+    setCollapsed((prev) => {
+      const next = new Set(prev)
+      if (next.has(cat)) next.delete(cat)
+      else next.add(cat)
+      return next
+    })
+  }
+
+  // While searching, force every section open so matches are never hidden.
+  const searchActive = search.trim().length > 0
 
   const visibleByCategory = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -42,7 +55,13 @@ export function MenuBrowser({ order, onSetQty, showAllergenNote = true }: Props)
     return map
   }, [search, filters])
 
-  const totalVisible = [...visibleByCategory.values()].reduce((n, items) => n + items.length, 0)
+  const shownCategories = CATEGORIES.filter((cat) => (visibleByCategory.get(cat) ?? []).length > 0)
+  const totalVisible = shownCategories.reduce((n, cat) => n + (visibleByCategory.get(cat)?.length ?? 0), 0)
+  const allCollapsed = !searchActive && shownCategories.every((cat) => collapsed.has(cat))
+
+  function toggleAll() {
+    setCollapsed(allCollapsed ? new Set() : new Set(shownCategories))
+  }
 
   return (
     <>
@@ -52,17 +71,46 @@ export function MenuBrowser({ order, onSetQty, showAllergenNote = true }: Props)
         <p className="empty no-results">No dishes match your search or filters.</p>
       )}
 
-      {CATEGORIES.map((cat) => {
+      {shownCategories.length > 0 && !searchActive && (
+        <div className="collapse-all-row">
+          <button type="button" className="collapse-all" onClick={toggleAll}>
+            {allCollapsed ? 'Expand all' : 'Collapse all'}
+          </button>
+        </div>
+      )}
+
+      {shownCategories.map((cat) => {
         const items = visibleByCategory.get(cat) ?? []
-        if (items.length === 0) return null
+        const isOpen = searchActive || !collapsed.has(cat)
+        // How many of this guest's selected items fall in this category (for the badge).
+        const inOrder = MENU.filter((m) => m.category === cat).reduce(
+          (n, item) => n + item.variants.reduce((s, _v, i) => s + (order[`${item.id}::${i}`] ?? 0), 0),
+          0,
+        )
         return (
           <section className="menu-section" key={cat}>
-            <h2 className="section-heading">{cat}</h2>
-            <div className="menu-items">
-              {items.map((item) => (
-                <MenuItemRow key={item.id} item={item} order={order} onSetQty={onSetQty} />
-              ))}
-            </div>
+            <h2 className="section-heading">
+              <button
+                type="button"
+                className="section-toggle"
+                aria-expanded={isOpen}
+                disabled={searchActive}
+                onClick={() => toggleCategory(cat)}
+              >
+                <span className="section-name">{cat}</span>
+                {inOrder > 0 && <span className="section-badge">{inOrder}</span>}
+                <span className="section-chevron" aria-hidden="true" data-open={isOpen}>
+                  ⌄
+                </span>
+              </button>
+            </h2>
+            {isOpen && (
+              <div className="menu-items">
+                {items.map((item) => (
+                  <MenuItemRow key={item.id} item={item} order={order} onSetQty={onSetQty} />
+                ))}
+              </div>
+            )}
           </section>
         )
       })}
