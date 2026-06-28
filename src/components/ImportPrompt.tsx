@@ -1,3 +1,4 @@
+import { useMenu } from '../MenuContext'
 import { buildOrderLines, gbp, orderTotal } from '../orderUtils'
 import type { SharePayload } from '../share'
 
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function ImportPrompt({ payload, onAdd, onCancel }: Props) {
+  const { skuMap } = useMenu()
   if (!payload) {
     return (
       <div className="import-prompt">
@@ -22,8 +24,8 @@ export function ImportPrompt({ payload, onAdd, onCancel }: Props) {
     )
   }
 
-  const lines = buildOrderLines(payload.order)
-  const total = orderTotal(payload.order)
+  const lines = buildOrderLines(payload.order, skuMap)
+  const total = orderTotal(payload.order, skuMap)
 
   return (
     <div className="import-prompt">

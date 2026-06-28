@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useMenu } from '../MenuContext'
 import { buildOrderLines, gbp, orderItemCount, orderTotal } from '../orderUtils'
 import { buildShareLink, encodeOrder } from '../share'
 import type { Order } from '../types'
@@ -12,11 +13,12 @@ interface Props {
 }
 
 export function MyOrderPanel({ name, order, onName, onSetQty, onClear }: Props) {
+  const { skuMap } = useMenu()
   const [created, setCreated] = useState(false)
   const [copied, setCopied] = useState<'link' | 'code' | null>(null)
 
-  const lines = buildOrderLines(order)
-  const total = orderTotal(order)
+  const lines = buildOrderLines(order, skuMap)
+  const total = orderTotal(order, skuMap)
   const count = orderItemCount(order)
   const nameOk = name.trim().length > 0
   const hasItems = lines.length > 0

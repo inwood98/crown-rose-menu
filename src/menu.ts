@@ -1,4 +1,4 @@
-import type { Category, MenuItem, Sku } from './types'
+import type { Category, MenuItem } from './types'
 
 /**
  * BA Crown Rose menu — June 2026.
@@ -840,15 +840,3 @@ export const CATEGORIES: Category[] = [
 export function skuKey(itemId: string, variantIndex: number): string {
   return `${itemId}::${variantIndex}`
 }
-
-/** Flattened list of every selectable line, in menu order. */
-export const SKUS: Sku[] = MENU.flatMap((item) =>
-  item.variants.map((variant, i) => ({
-    key: skuKey(item.id, i),
-    item,
-    variant,
-  })),
-)
-
-/** Fast lookup from sku key to its {item, variant}. */
-export const SKU_BY_KEY: Map<string, Sku> = new Map(SKUS.map((s) => [s.key, s]))

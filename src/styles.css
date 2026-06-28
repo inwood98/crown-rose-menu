@@ -747,6 +747,121 @@ body {
   border-color: var(--green-500);
 }
 
+/* ───────────────────────── Menu setup ───────────────────────── */
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  user-select: none;
+}
+.switch input {
+  width: 2.6rem;
+  height: 1.5rem;
+  appearance: none;
+  background: var(--border);
+  border-radius: 999px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  flex: none;
+}
+.switch input:checked {
+  background: var(--green-600);
+}
+.switch input::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s ease;
+}
+.switch input:checked::after {
+  transform: translateX(1.1rem);
+}
+.switch-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.reset-all {
+  margin-top: 0.6rem;
+  width: 100%;
+}
+
+.setup-items {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+.setup-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--border);
+}
+.setup-name {
+  flex: 1 1 12rem;
+  min-width: 0;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.setup-prices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.setup-price {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.setup-price-label {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+}
+.setup-price-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+  padding: 0 0.5rem;
+  color: var(--text-soft);
+}
+.setup-price-input input {
+  width: 4.2rem;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 0.45rem 0;
+}
+.setup-reset {
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-size: 1rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
 /* ───────────────────────── Guest editor (admin) ───────────────────────── */
 .editor-overlay {
   position: fixed;

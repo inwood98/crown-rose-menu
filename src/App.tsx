@@ -1,16 +1,25 @@
 import { useEffect, useMemo, useState } from 'react'
 import { loadAdmin, newGuestId, saveAdmin, type AdminState } from './adminStorage'
+import { MenuProvider } from './MenuContext'
+import {
+  decodeConfig,
+  loadMenuConfig,
+  saveMenuConfig,
+  type MenuConfig,
+} from './menuConfig'
 import { loadTheme, saveTheme, type Theme } from './storage'
 import { parseShared, type SharePayload } from './share'
 import type { GuestEntry, Order } from './types'
 import { AdminView } from './components/AdminView'
 import { GuestView } from './components/GuestView'
 import { ImportPrompt } from './components/ImportPrompt'
+import { MenuSetup } from './components/MenuSetup'
 import { ThemeToggle } from './components/ThemeToggle'
 
 type Route =
   | { kind: 'guest' }
   | { kind: 'admin' }
+  | { kind: 'menu' }
   | { kind: 'import'; payload: SharePayload | null }
 
 function routeFromHash(): Route {
@@ -19,19 +28,38 @@ function routeFromHash(): Route {
     return { kind: 'import', payload: parseShared(hash) }
   }
   if (hash.startsWith('#admin')) return { kind: 'admin' }
+  if (hash.startsWith('#menu')) return { kind: 'menu' }
   return { kind: 'guest' }
+}
+
+/** Config from a guest link (#m=…) takes priority, then the saved config. */
+function initialConfig(): MenuConfig {
+  const m = location.hash.match(/#m=([A-Za-z0-9_-]+)/)
+  if (m) {
+    const cfg = decodeConfig(m[1])
+    if (cfg) {
+      saveMenuConfig(cfg)
+      return cfg
+    }
+  }
+  return loadMenuConfig()
 }
 
 export default function App() {
   const [theme, setTheme] = useState<Theme>(loadTheme)
   const [route, setRoute] = useState<Route>(routeFromHash)
   const [admin, setAdmin] = useState<AdminState>(loadAdmin)
+  const [menuConfig, setMenuConfig] = useState<MenuConfig>(initialConfig)
 
   useEffect(() => {
     const onHash = () => setRoute(routeFromHash())
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
+
+  useEffect(() => {
+    saveMenuConfig(menuConfig)
+  }, [menuConfig])
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -76,7 +104,7 @@ export default function App() {
     }))
   }
 
-  const isAdminSide = route.kind === 'admin' || route.kind === 'import'
+  const isAdminSide = route.kind !== 'guest'
 
   const headerSub = useMemo(
     () =>
@@ -87,6 +115,7 @@ export default function App() {
   )
 
   return (
+    <MenuProvider config={menuConfig}>
     <div className="app">
       <header className="app-header">
         <div className="header-actions">
@@ -140,6 +169,10 @@ export default function App() {
           />
         )}
 
+        {route.kind === 'menu' && (
+          <MenuSetup config={menuConfig} onChange={setMenuConfig} />
+        )}
+
         {route.kind === 'import' && (
           <ImportPrompt
             payload={route.payload}
@@ -154,5 +187,6 @@ export default function App() {
         )}
       </main>
     </div>
+    </MenuProvider>
   )
 }

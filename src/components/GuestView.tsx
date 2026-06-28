@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useMenu } from '../MenuContext'
 import { gbp, orderItemCount, orderTotal } from '../orderUtils'
 import { loadGuestDraft, saveGuestDraft } from '../storage'
 import type { Order } from '../types'
@@ -6,6 +7,7 @@ import { MenuBrowser } from './MenuBrowser'
 import { MyOrderPanel } from './MyOrderPanel'
 
 export function GuestView() {
+  const { skuMap } = useMenu()
   const initial = useMemo(loadGuestDraft, [])
   const [name, setName] = useState(initial.name)
   const [order, setOrder] = useState<Order>(initial.order)
@@ -24,7 +26,7 @@ export function GuestView() {
     })
   }
 
-  const total = orderTotal(order)
+  const total = orderTotal(order, skuMap)
   const count = orderItemCount(order)
 
   return (

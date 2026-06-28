@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useMenu } from '../MenuContext'
+import { encodeConfig, isDefaultConfig } from '../menuConfig'
 import { buildOrderLines, buildRosterExport, buildRosterText, gbp, orderTotal, rosterTotal } from '../orderUtils'
 import type { GuestEntry } from '../types'
 import { GuestEditor } from './GuestEditor'
@@ -24,13 +26,32 @@ export function AdminView({
   onUpdateGuestOrder,
   onSetPubEmail,
 }: Props) {
+  const { skuMap, config } = useMenu()
   const [paste, setPaste] = useState('')
   const [pasteError, setPasteError] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
 
   const editingGuest = guests.find((g) => g.id === editingId) ?? null
-  const grand = rosterTotal(guests)
+  const grand = rosterTotal(guests, skuMap)
+
+  const guestLink = `${location.origin}${location.pathname}#m=${encodeConfig(config)}`
+
+  async function copyGuestLink() {
+    try {
+      await navigator.clipboard.writeText(guestLink)
+    } catch {
+      const ta = document.createElement('textarea')
+      ta.value = guestLink
+      document.body.appendChild(ta)
+      ta.select()
+      document.execCommand('copy')
+      ta.remove()
+    }
+    setLinkCopied(true)
+    window.setTimeout(() => setLinkCopied(false), 2000)
+  }
   const emailOk = EMAIL_RE.test(pubEmail.trim())
   const hasGuests = guests.length > 0
 
@@ -45,7 +66,7 @@ export function AdminView({
   }
 
   function downloadJson() {
-    const data = buildRosterExport(guests)
+    const data = buildRosterExport(guests, skuMap)
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -58,7 +79,7 @@ export function AdminView({
   }
 
   async function copyAll() {
-    const text = buildRosterText(guests)
+    const text = buildRosterText(guests, skuMap)
     try {
       await navigator.clipboard.writeText(text)
     } catch {
@@ -75,7 +96,7 @@ export function AdminView({
 
   function emailPub() {
     const subject = `Pre-order for ${guests.length} — Rose & Crown · Nicola & Jennifer's 50th`
-    const body = buildRosterText(guests)
+    const body = buildRosterText(guests, skuMap)
     window.location.href = `mailto:${encodeURIComponent(pubEmail.trim())}?subject=${encodeURIComponent(
       subject,
     )}&body=${encodeURIComponent(body)}`
@@ -86,6 +107,25 @@ export function AdminView({
       <p className="role-intro">
         Add each guest’s order as it comes in, then send the whole table to the pub.
       </p>
+
+      <section className="admin-card">
+        <div className="admin-roster-head">
+          <h2>Invite guests</h2>
+          <a className="roster-edit" href="#menu">
+            Menu setup
+          </a>
+        </div>
+        <p className="admin-hint">
+          Share this link with the family — it includes your menu{' '}
+          {isDefaultConfig(config) ? '(currently the full menu).' : 'changes.'}
+        </p>
+        <div className="share-row">
+          <input className="share-field" type="text" readOnly value={guestLink} aria-label="Guest link" />
+          <button type="button" className="btn primary" onClick={copyGuestLink}>
+            {linkCopied ? 'Copied!' : 'Copy'}
+          </button>
+        </div>
+      </section>
 
       <section className="admin-card">
         <h2>Add a guest’s order</h2>
@@ -121,7 +161,7 @@ export function AdminView({
 
         <ol className="roster">
           {guests.map((g) => {
-            const lines = buildOrderLines(g.order)
+            const lines = buildOrderLines(g.order, skuMap)
             return (
               <li className="roster-guest" key={g.id}>
                 <div className="roster-guest-head">
@@ -133,7 +173,7 @@ export function AdminView({
                     onChange={(e) => onUpdateGuestName(g.id, e.target.value)}
                     aria-label="Guest name"
                   />
-                  <span className="roster-subtotal">{gbp(orderTotal(g.order))}</span>
+                  <span className="roster-subtotal">{gbp(orderTotal(g.order, skuMap))}</span>
                   <button
                     type="button"
                     className="roster-edit"

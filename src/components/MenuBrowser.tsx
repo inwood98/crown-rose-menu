@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { CATEGORIES, MENU } from '../menu'
+import { useMenu } from '../MenuContext'
 import type { Category, Dietary, MenuItem, Order } from '../types'
 import { FilterBar } from './FilterBar'
 import { MenuItemRow } from './MenuItemRow'
@@ -13,6 +13,7 @@ interface Props {
 
 /** The full menu with search + dietary filters, bound to an order. */
 export function MenuBrowser({ order, onSetQty, showAllergenNote = true }: Props) {
+  const { items: menuItems, visibleCategories } = useMenu()
   const [search, setSearch] = useState('')
   const [filters, setFilters] = useState<Set<Dietary>>(new Set())
   const [collapsed, setCollapsed] = useState<Set<Category>>(new Set())
@@ -49,13 +50,15 @@ export function MenuBrowser({ order, onSetQty, showAllergenNote = true }: Props)
       )
     }
     const map = new Map<string, MenuItem[]>()
-    for (const cat of CATEGORIES) {
-      map.set(cat, MENU.filter((item) => item.category === cat && match(item)))
+    for (const cat of visibleCategories) {
+      map.set(cat, menuItems.filter((item) => item.category === cat && match(item)))
     }
     return map
-  }, [search, filters])
+  }, [search, filters, menuItems, visibleCategories])
 
-  const shownCategories = CATEGORIES.filter((cat) => (visibleByCategory.get(cat) ?? []).length > 0)
+  const shownCategories = visibleCategories.filter(
+    (cat) => (visibleByCategory.get(cat) ?? []).length > 0,
+  )
   const totalVisible = shownCategories.reduce((n, cat) => n + (visibleByCategory.get(cat)?.length ?? 0), 0)
   const allCollapsed = !searchActive && shownCategories.every((cat) => collapsed.has(cat))
 
@@ -83,7 +86,7 @@ export function MenuBrowser({ order, onSetQty, showAllergenNote = true }: Props)
         const items = visibleByCategory.get(cat) ?? []
         const isOpen = searchActive || !collapsed.has(cat)
         // How many of this guest's selected items fall in this category (for the badge).
-        const inOrder = MENU.filter((m) => m.category === cat).reduce(
+        const inOrder = menuItems.filter((m) => m.category === cat).reduce(
           (n, item) => n + item.variants.reduce((s, _v, i) => s + (order[`${item.id}::${i}`] ?? 0), 0),
           0,
         )

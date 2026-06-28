@@ -1,3 +1,4 @@
+import { useMenu } from '../MenuContext'
 import { gbp, orderItemCount, orderTotal } from '../orderUtils'
 import type { GuestEntry } from '../types'
 import { MenuBrowser } from './MenuBrowser'
@@ -11,7 +12,8 @@ interface Props {
 
 /** Full-screen editor letting the organiser change a guest's order. */
 export function GuestEditor({ guest, onName, onSetQty, onClose }: Props) {
-  const total = orderTotal(guest.order)
+  const { skuMap } = useMenu()
+  const total = orderTotal(guest.order, skuMap)
   const count = orderItemCount(guest.order)
 
   return (

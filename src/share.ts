@@ -1,19 +1,9 @@
+import { fromUrlSafeB64, toUrlSafeB64 } from './b64'
 import type { Order } from './types'
 
 export interface SharePayload {
   name: string
   order: Order
-}
-
-function toUrlSafeB64(s: string): string {
-  const b64 = btoa(String.fromCharCode(...new TextEncoder().encode(s)))
-  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-}
-
-function fromUrlSafeB64(s: string): string {
-  const b64 = s.replace(/-/g, '+').replace(/_/g, '/')
-  const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))
-  return new TextDecoder().decode(bytes)
 }
 
 /** Encode a guest's order into a compact, URL-safe code. */
