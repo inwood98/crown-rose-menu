@@ -1,8 +1,8 @@
-import { useState } from 'react'
 import { CATEGORIES, MENU, skuKey } from '../menu'
 import { encodeConfig, isDefaultConfig, type MenuConfig } from '../menuConfig'
 import { gbp } from '../orderUtils'
 import type { Category } from '../types'
+import { GuestLinkBox } from './GuestLinkBox'
 
 interface Props {
   config: MenuConfig
@@ -10,8 +10,6 @@ interface Props {
 }
 
 export function MenuSetup({ config, onChange }: Props) {
-  const [linkCopied, setLinkCopied] = useState(false)
-
   const guestLink = `${location.origin}${location.pathname}#m=${encodeConfig(config)}`
 
   function toggleCategory(cat: Category) {
@@ -19,6 +17,12 @@ export function MenuSetup({ config, onChange }: Props) {
       ? config.hidden.filter((c) => c !== cat)
       : [...config.hidden, cat]
     onChange({ ...config, hidden })
+  }
+
+  function setEvent(field: 'when' | 'venue' | 'deadline', value: string) {
+    const event = { ...(config.event ?? {}), [field]: value }
+    const any = (event.when ?? '').trim() || (event.venue ?? '').trim() || (event.deadline ?? '').trim()
+    onChange({ ...config, event: any ? event : undefined })
   }
 
   function setName(itemId: string, value: string, fallback: string) {
@@ -37,21 +41,6 @@ export function MenuSetup({ config, onChange }: Props) {
     onChange({ ...config, prices })
   }
 
-  async function copyLink() {
-    try {
-      await navigator.clipboard.writeText(guestLink)
-    } catch {
-      const ta = document.createElement('textarea')
-      ta.value = guestLink
-      document.body.appendChild(ta)
-      ta.select()
-      document.execCommand('copy')
-      ta.remove()
-    }
-    setLinkCopied(true)
-    window.setTimeout(() => setLinkCopied(false), 2000)
-  }
-
   return (
     <div className="admin">
       <p className="role-intro">
@@ -66,12 +55,7 @@ export function MenuSetup({ config, onChange }: Props) {
             Back to organiser
           </a>
         </div>
-        <div className="share-row">
-          <input className="share-field" type="text" readOnly value={guestLink} aria-label="Guest link" />
-          <button type="button" className="btn primary" onClick={copyLink}>
-            {linkCopied ? 'Copied!' : 'Copy'}
-          </button>
-        </div>
+        <GuestLinkBox link={guestLink} />
         {!isDefaultConfig(config) && (
           <button
             type="button"
@@ -84,6 +68,41 @@ export function MenuSetup({ config, onChange }: Props) {
             Reset everything to default
           </button>
         )}
+      </section>
+
+      <section className="admin-card">
+        <h2>Event details</h2>
+        <p className="admin-hint">Shown to guests at the top of the menu. Leave blank to hide.</p>
+        <div className="field">
+          <label htmlFor="ev-when">When</label>
+          <input
+            id="ev-when"
+            type="text"
+            placeholder="e.g. Saturday 4 July 2026, 7pm"
+            value={config.event?.when ?? ''}
+            onChange={(e) => setEvent('when', e.target.value)}
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="ev-venue">Venue</label>
+          <input
+            id="ev-venue"
+            type="text"
+            placeholder="e.g. Rose & Crown"
+            value={config.event?.venue ?? ''}
+            onChange={(e) => setEvent('venue', e.target.value)}
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="ev-deadline">Order by (deadline)</label>
+          <input
+            id="ev-deadline"
+            type="text"
+            placeholder="e.g. Friday 27 June"
+            value={config.event?.deadline ?? ''}
+            onChange={(e) => setEvent('deadline', e.target.value)}
+          />
+        </div>
       </section>
 
       {CATEGORIES.map((cat) => {

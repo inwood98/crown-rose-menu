@@ -3,6 +3,7 @@ import { loadAdmin, newGuestId, saveAdmin, type AdminState } from './adminStorag
 import { MenuProvider } from './MenuContext'
 import {
   decodeConfig,
+  hasEventDetails,
   loadMenuConfig,
   saveMenuConfig,
   type MenuConfig,
@@ -148,6 +149,16 @@ export default function App() {
       >
         📄 View the original menu PDF
       </a>
+
+      {hasEventDetails(menuConfig) && (
+        <div className="event-strip">
+          {menuConfig.event?.when && <span>📅 {menuConfig.event.when}</span>}
+          {menuConfig.event?.venue && <span>📍 {menuConfig.event.venue}</span>}
+          {menuConfig.event?.deadline && (
+            <span className="event-deadline">⏰ Order by {menuConfig.event.deadline}</span>
+          )}
+        </div>
+      )}
 
       <main>
         {route.kind === 'guest' && <GuestView />}

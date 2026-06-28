@@ -4,6 +4,7 @@ import { encodeConfig, isDefaultConfig } from '../menuConfig'
 import { buildOrderLines, buildRosterExport, buildRosterText, gbp, orderTotal, rosterTotal } from '../orderUtils'
 import type { GuestEntry } from '../types'
 import { GuestEditor } from './GuestEditor'
+import { GuestLinkBox } from './GuestLinkBox'
 
 interface Props {
   guests: GuestEntry[]
@@ -30,28 +31,12 @@ export function AdminView({
   const [paste, setPaste] = useState('')
   const [pasteError, setPasteError] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [linkCopied, setLinkCopied] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
 
   const editingGuest = guests.find((g) => g.id === editingId) ?? null
   const grand = rosterTotal(guests, skuMap)
 
   const guestLink = `${location.origin}${location.pathname}#m=${encodeConfig(config)}`
-
-  async function copyGuestLink() {
-    try {
-      await navigator.clipboard.writeText(guestLink)
-    } catch {
-      const ta = document.createElement('textarea')
-      ta.value = guestLink
-      document.body.appendChild(ta)
-      ta.select()
-      document.execCommand('copy')
-      ta.remove()
-    }
-    setLinkCopied(true)
-    window.setTimeout(() => setLinkCopied(false), 2000)
-  }
   const emailOk = EMAIL_RE.test(pubEmail.trim())
   const hasGuests = guests.length > 0
 
@@ -119,12 +104,7 @@ export function AdminView({
           Share this link with the family — it includes your menu{' '}
           {isDefaultConfig(config) ? '(currently the full menu).' : 'changes.'}
         </p>
-        <div className="share-row">
-          <input className="share-field" type="text" readOnly value={guestLink} aria-label="Guest link" />
-          <button type="button" className="btn primary" onClick={copyGuestLink}>
-            {linkCopied ? 'Copied!' : 'Copy'}
-          </button>
-        </div>
+        <GuestLinkBox link={guestLink} />
       </section>
 
       <section className="admin-card">

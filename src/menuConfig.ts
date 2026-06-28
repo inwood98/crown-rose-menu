@@ -7,6 +7,15 @@ import type { Category, MenuItem, Sku } from './types'
  * are stored, so the original menu is always the fallback. The config travels
  * to guests inside the share link (`#m=…`).
  */
+export interface EventDetails {
+  /** When the meal is, free text e.g. "Saturday 4 July 2026, 7pm". */
+  when?: string
+  /** Venue, free text. */
+  venue?: string
+  /** Order cutoff, free text e.g. "Friday 27 June". */
+  deadline?: string
+}
+
 export interface MenuConfig {
   /** Categories the organiser has hidden. */
   hidden: Category[]
@@ -14,9 +23,17 @@ export interface MenuConfig {
   names: Record<string, string>
   /** skuKey (itemId::variantIndex) -> overridden price. */
   prices: Record<string, number>
+  /** Optional event details shown to guests. */
+  event?: EventDetails
 }
 
 export const EMPTY_CONFIG: MenuConfig = { hidden: [], names: {}, prices: {} }
+
+/** True when no event details are filled in. */
+export function hasEventDetails(c: MenuConfig): boolean {
+  const e = c.event
+  return !!e && !!(e.when?.trim() || e.venue?.trim() || e.deadline?.trim())
+}
 
 const CONFIG_KEY = 'crown-rose-menu-config'
 
@@ -53,9 +70,17 @@ export function computeMenuData(config: MenuConfig): MenuData {
   return { config, items, visibleCategories, skuMap }
 }
 
+function sanitizeEvent(raw: unknown): EventDetails | undefined {
+  if (!raw || typeof raw !== 'object') return undefined
+  const e = raw as Record<string, unknown>
+  const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v : undefined)
+  const out: EventDetails = { when: str(e.when), venue: str(e.venue), deadline: str(e.deadline) }
+  return out.when || out.venue || out.deadline ? out : undefined
+}
+
 function sanitize(raw: Partial<MenuConfig> | null | undefined): MenuConfig {
   if (!raw || typeof raw !== 'object') return { ...EMPTY_CONFIG }
-  return {
+  const config: MenuConfig = {
     hidden: Array.isArray(raw.hidden)
       ? raw.hidden.filter((c): c is Category => CATEGORIES.includes(c as Category))
       : [],
@@ -67,6 +92,9 @@ function sanitize(raw: Partial<MenuConfig> | null | undefined): MenuConfig {
           )
         : {},
   }
+  const event = sanitizeEvent(raw.event)
+  if (event) config.event = event
+  return config
 }
 
 export function encodeConfig(config: MenuConfig): string {

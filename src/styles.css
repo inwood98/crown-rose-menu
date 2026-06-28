@@ -163,6 +163,44 @@ body {
   color: #20241f;
 }
 
+.event-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem 1.4rem;
+  padding: 0.6rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.event-deadline {
+  color: #d2604f;
+}
+
+.guest-link-box {
+  display: grid;
+  gap: 0.5rem;
+}
+.qr-toggle {
+  justify-self: start;
+}
+.qr-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+}
+.qr-frame {
+  background: #fff;
+  padding: 0.85rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  line-height: 0;
+}
+
 /* ───────────────────────── Layout ───────────────────────── */
 .layout {
   max-width: 1200px;
